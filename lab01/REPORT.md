@@ -57,7 +57,7 @@ images/01_device_api.png
 插入：
 
 
-[![Device API 发现证据](images/01_device_api.png)](https://gcore.jsdelivr.net/gh/Su-su-y/bigdata-collection-labs-112404260105@main/lab01/images/01_device_api.png)
+![Device API 发现证据](images/01_device_api.png)
 
 
 ## 1.2 Company：判断静态加载
@@ -86,8 +86,7 @@ images/02_company_source.png
 
 插入：
 
-[![Company 静态加载证据](images/02_company_source.png)](https://gcore.jsdelivr.net/gh/Su-su-y/bigdata-collection-labs-112404260105@main/lab01/images/02_company_source.png)
-
+![Company 静态加载证据](images/02_company_source.png)
 
 ---
 
@@ -241,7 +240,7 @@ images/03_company_next.png
 插入：
 
 
-[![Company 下一页元素](images/03_company_next.png)](https://gcore.jsdelivr.net/gh/Su-su-y/bigdata-collection-labs-112404260105@main/lab01/images/03_company_next.png)
+![Company 下一页元素](images/03_company_next.png)
 
 
 ## 4.2 关键代码
@@ -313,7 +312,7 @@ Company–Device 不一致企业数
 插入：
 
 
-[![最终验证结果](images/04_validation.png)](https://gcore.jsdelivr.net/gh/Su-su-y/bigdata-collection-labs-112404260105@main/lab01/images/04_validation.png)
+![最终验证结果](images/04_validation.png)
 
 
 ## 5.2 一致性检查关键代码
