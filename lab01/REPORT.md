@@ -12,6 +12,10 @@
 > 完整代码保存在 `lab1_html_api.ipynb`。  
 > 本报告只填写关键发现、关键代码、结果和指定截图，**不要把整份 Notebook 复制进来**。
 
+> 图片加载说明：截图文件均已完整上传。如果你的网络无法访问 GitHub 图片
+> CDN（`raw.githubusercontent.com`），页面内图片可能无法预览；点击截图会
+> 自动打开 jsDelivr 镜像地址。
+
 ---
 
 # 任务 1：判断数据加载方式
@@ -53,7 +57,7 @@ images/01_device_api.png
 插入：
 
 
-![Device API 发现证据](images/01_device_api.png)
+[![Device API 发现证据](images/01_device_api.png)](https://gcore.jsdelivr.net/gh/Su-su-y/bigdata-collection-labs-112404260105@main/lab01/images/01_device_api.png)
 
 
 ## 1.2 Company：判断静态加载
@@ -65,7 +69,7 @@ images/01_device_api.png
 使用“右键 → 查看网页源代码”后，在源代码中可以搜索到页面真实显示的企业名称。例如，能够找到 `<h2><a href="/companies/C000001">临港精工001有限公司</a></h2>`，说明企业记录已经包含在服务器返回的 HTML 中。
 
 ### 【截图 2】Company 静态加载证据
-![Company 静态加载证据](images/03_company_next.png)
+
 文件名：
 
 ```text
@@ -82,7 +86,7 @@ images/02_company_source.png
 
 插入：
 
-![Company 静态加载证据](images/02_company_source.png)
+[![Company 静态加载证据](images/02_company_source.png)](https://gcore.jsdelivr.net/gh/Su-su-y/bigdata-collection-labs-112404260105@main/lab01/images/02_company_source.png)
 
 
 ---
@@ -237,7 +241,7 @@ images/03_company_next.png
 插入：
 
 
-![Company 下一页元素](images/03_company_next.png)
+[![Company 下一页元素](images/03_company_next.png)](https://gcore.jsdelivr.net/gh/Su-su-y/bigdata-collection-labs-112404260105@main/lab01/images/03_company_next.png)
 
 
 ## 4.2 关键代码
@@ -309,7 +313,7 @@ Company–Device 不一致企业数
 插入：
 
 
-![最终验证结果](images/04_validation.png)
+[![最终验证结果](images/04_validation.png)](https://gcore.jsdelivr.net/gh/Su-su-y/bigdata-collection-labs-112404260105@main/lab01/images/04_validation.png)
 
 
 ## 5.2 一致性检查关键代码
