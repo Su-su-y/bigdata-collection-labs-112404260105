@@ -41,7 +41,7 @@
 
 浏览器 Elements 面板中确认 `div.property` 刚好包住一条房源，内部同时包含标题、楼盘、地址、户型、属性列表和价格。代码先用 `soup.select("div.property")` 取得所有房源，再对每条房源使用 `row.select_one(...)`。截图任务 2-1 会在 Elements 中框出面积、楼层、年代和单价所在的 DOM 节点。
 ![选择器与 DOM 节点](images/02-selector-dom.png)
-
+![问题一](images/question1(1).png)
 
 说明：删除的是从页面根节点到标题之间的外层布局和固定序号路径，保留了稳定的语义 class。父容器通过实际在线 DOM 核对，`div.property` 的数量与当前页房源数一致，因此可以确认它刚好包含一条完整房源。相对选择器只在当前房源内部查找，不会把其他房源的字段混入。
 
@@ -65,7 +65,8 @@
 
 ![第一条房源8字段解析结果](images/02-selector-parse-result.png)
 
-说明：`select()` 用于一次取得多条房源或多个属性项，`select_one()` 用于取得当前房源中的一个字段节点。面积按“㎡”后缀识别，楼层按“层”关键字识别，不会把“南北”等朝向误当楼层；建造年代按“年建造”识别，缺失时为空字符串。单价取自 `property-price-average`，保存的是 `16465元/㎡` 这类单价，不是 `148万` 这类总价。
+说明：(1)每执行一次循环，row 就代表一条房源；解析出的数据追加到 records。翻页函数随后用 all_records.extend(records) 把本页 60 条记录加入总列表。
+(2)`select()` 用于一次取得多条房源或多个属性项，`select_one()` 用于取得当前房源中的一个字段节点。面积按“㎡”后缀识别，楼层按“层”关键字识别，不会把“南北”等朝向误当楼层；建造年代按“年建造”识别，缺失时为空字符串。单价取自 `property-price-average`，保存的是 `16465元/㎡` 这类单价，不是 `148万` 这类总价。
 
 首条房源实际解析结果为：
 
@@ -87,9 +88,12 @@
 - 实际停止原因：第 10 页的 `div.pagination` 仍然存在，上一页节点是活动的 `a.pre.pre-active`，下一页节点变为 `<a class="next" href="#">下一页</a>`，已没有 `next-active` 且 `href` 为 `#`，确认按钮已禁用；`next_href` 为 `None`，程序执行 `break` 正常停止。
 
 分页循环使用 `visited` 集合记录访问过的地址，先检查当前地址是否重复，再用 `urljoin(current_url, next_href)` 补全下一页。补全后会检查目标站点的 `netloc` 仍为教学站，并检查下一页地址没有访问过；每次请求后至少等待 1 秒。安全上限为 20 页，若达到上限会抛出“达到安全页数上限，采集中止”，不会把异常当成采集完成。
+
+![分页、循环与停止条件代码](images/question3.png)
+
 ![分页、循环与停止条件代码](images/02-pagination-code.png)
 
-![分页运行日志与停止判断](images/02-pagination-run.png)
+
 
 说明：第 1 页的 `?page=2` 补全后实际打开第 2 页，第 2 页又给出 `?page=3`，说明地址更新有效。第 10 页的日志中 `next_href` 为 `null`，对应代码的 `if not next_href` 停止分支。随后重新检查了第 10 页 DOM：分页区域没有消失，`a.pre.pre-active` 仍能返回第 9 页，而下一页按钮为 `<a class="next" href="#">`，只缺少 `next-active`，因此属于按钮禁用而不是结构异常。`visited`、同站检查和页数上限共同防止重复采集和无限循环；若请求失败、页面无房源或地址重复，程序会报错而不是继续伪造结果。
 
@@ -106,9 +110,9 @@ title, house, address, struct, area, floor, maketime, price
 ```
 
 全部 600 条记录按 8 个字段组成的元组去重：`key = tuple(record)`，仅当 `key not in seen` 时加入 `deduped`。因此只删除 8 个字段完全相同的记录，不会因为标题相同但地址或价格不同而误删。
+![问题四](images/question4.png)
 ![CSV保存与去重代码](images/02-csv-save.png)
-
-![CSV回读、去重统计与样本](images/02-csv-read.png)
+![问题四(2)](images/question4(2).png)
 
 
 
@@ -142,7 +146,12 @@ title, house, address, struct, area, floor, maketime, price
 
 ![读取CSV、批量入库、提交回滚与关闭代码](images/03-mysql-load.png)
 
-说明：CSV 值在 `execute`/`executemany` 中通过参数占位符传入，没有使用字符串拼接。写入成功后调用 `commit()`；发生异常时在 `except` 中调用 `rollback()`，并在 `finally` 中先关闭游标、再关闭连接。再次运行时，已有 8 字段元组会命中 `existing`，`missing` 为空，所以新增条数为 0。
+说明：(1)executemany() 接收两部分：一条带占位符的 SQL，以及一个包含多条记录的列表。它会将 missing 中每一条房源依次绑定到这条 INSERT 上，相当于批量执行多次插入，但不能把 8 个值直接拼进 SQL 字符串。
+
+(2)本次通过 pymysql.connect(**DB_CONFIG) 建立 MySQL 数据库连接。其中，host="mysql" 表示课程 Docker 环境中的 MySQL 服务名，不能写成 localhost；port=3306 表示 MySQL 服务监听的端口；user="student" 表示用于登录数据库的用户名；password="123456" 表示课程教学数据库密码；database="smartpark_lab" 表示本次实验使用的数据库名称，因此程序实际连接的是 smartpark_lab 数据库。
+
+charset="utf8mb4" 用于设置连接字符集，以支持中文以及四字节 Unicode 字符。autocommit=False 表示关闭自动提交：程序不会在每条 SQL 执行后立即提交，而需要显式调用 commit() 提交事务；如果执行过程中发生异常，则调用 rollback() 撤销尚未提交的修改。
+(3)CSV 值在 `execute`/`executemany` 中通过参数占位符传入，没有使用字符串拼接。写入成功后调用 `commit()`；发生异常时在 `except` 中调用 `rollback()`，并在 `finally` 中先关闭游标、再关闭连接。再次运行时，已有 8 字段元组会命中 `existing`，`missing` 为空，所以新增条数为 0。
 
 ### 2. 核对结果
 ![本次会话首次执行结果（执行前已有 498 条）](images/03-first-load.png)
